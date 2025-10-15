@@ -2,7 +2,9 @@ package ca.gbc.comp3095.wellnessresourceservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
+@EnableCaching
 @SpringBootApplication
 public class WellnessResourceServiceApplication {
 
