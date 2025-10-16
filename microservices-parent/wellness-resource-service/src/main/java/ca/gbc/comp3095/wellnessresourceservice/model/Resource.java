@@ -28,4 +28,12 @@ public class Resource implements Serializable {
     private String url;
 
     private static final long serialVersionUID = 1L;
+
+    // Convenience constructor for creating new Resources without specifying id
+    public Resource(String title, String description, String category, String url) {
+        this.title = title;
+        this.description = description;
+        this.category = category;
+        this.url = url;
+    }
 }
