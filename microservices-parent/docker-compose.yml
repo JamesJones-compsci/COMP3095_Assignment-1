@@ -1,0 +1,40 @@
+# version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: jamesjones
+      POSTGRES_PASSWORD: 100898394
+      POSTGRES_DB: wellness-resource-serviceDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/integrated/postgres/wellness-service/init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U jamesjones" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: wellness-redis
+    ports:
+      - "6379:6379"
+
+  wellness-service:
+    build: ./wellness-resource-service
+    image: wellness-service:1.0
+    container_name: wellness-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wellness-resource-serviceDB
+      SPRING_DATASOURCE_USERNAME: jamesjones
+      SPRING_DATASOURCE_PASSWORD: 100898394
+      SPRING_REDIS_HOST: wellness-redis
