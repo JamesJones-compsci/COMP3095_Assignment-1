@@ -49,4 +49,11 @@ public class ResourceController {
     public void deleteResource(@PathVariable Long id) {
         resourceService.deleteResource(id);
     }
+
+    // Get resources by category
+    @GetMapping("/category/{category}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Resource> getResourcesByCategory(@PathVariable String category) {
+        return resourceService.getResourcesByCategory(category);
+    }
 }

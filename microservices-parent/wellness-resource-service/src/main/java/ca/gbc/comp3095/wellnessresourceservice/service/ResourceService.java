@@ -18,16 +18,19 @@ public class ResourceService {
     private final ResourceRepository resourceRepository;
 
     public Resource saveResource(Resource resource) {
+
         return resourceRepository.save(resource);
     }
 
     @Cacheable(value = "resources")
     public List<Resource> getAllResources(){
+
         return resourceRepository.findAll();
     }
 
 
     public Optional<Resource> getResourceById(Long id){
+
         return resourceRepository.findById(id);
     }
 
@@ -43,9 +46,15 @@ public class ResourceService {
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
     }
 
+    // Use the new case-insensitive query
+    public List<Resource> getResourcesByCategory(String category) {
+        return resourceRepository.findByCategoryIgnoreCase(category);
+    }
+
 
     @CacheEvict(value = "resources", allEntries = true)
-    public void deleteResource(Long id){
+    public void deleteResource(Long id) {
+
         resourceRepository.deleteById(id);
     }
 }
