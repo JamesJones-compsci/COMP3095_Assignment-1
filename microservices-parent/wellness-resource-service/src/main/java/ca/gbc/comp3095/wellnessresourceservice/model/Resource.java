@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name = "resources")
+@Table(name = "wellness_resources")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,9 +22,16 @@ public class Resource implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
+
+    @Column(length=500)
     private String description;
+
+    @Column(nullable = false)
     private String category;   // e.g. "Mental Health", "Physical Fitness"
+
+    @Column(nullable = false)
     private String url;
 
     private static final long serialVersionUID = 1L;

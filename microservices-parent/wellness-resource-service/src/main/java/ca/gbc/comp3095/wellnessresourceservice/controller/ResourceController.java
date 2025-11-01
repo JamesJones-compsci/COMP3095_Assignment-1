@@ -7,12 +7,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/resources")
 @RequiredArgsConstructor
 public class ResourceController {
+
 
     private final ResourceService resourceService;
 
@@ -37,6 +40,12 @@ public class ResourceController {
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
     }
 
+    // Get resources by category
+    @GetMapping("/category/{category}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Resource> getByCategory(@PathVariable String category) {
+        return resourceService.getResourcesByCategory(category);
+    }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -48,12 +57,5 @@ public class ResourceController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteResource(@PathVariable Long id) {
         resourceService.deleteResource(id);
-    }
-
-    // Get resources by category
-    @GetMapping("/category/{category}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Resource> getResourcesByCategory(@PathVariable String category) {
-        return resourceService.getResourcesByCategory(category);
     }
 }

@@ -8,32 +8,37 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import org.springframework.cache.annotation.*;
+
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@CacheConfig(cacheNames = "wellness_resources")
 @RequiredArgsConstructor
 public class ResourceService {
 
     private final ResourceRepository resourceRepository;
 
+    @CachePut(key = "#result.id")
     public Resource saveResource(Resource resource) {
 
         return resourceRepository.save(resource);
     }
 
-    @Cacheable(value = "resources")
+    @Cacheable(key = "'all'")
     public List<Resource> getAllResources(){
 
         return resourceRepository.findAll();
     }
 
-
+    @Cacheable(key = "#id")
     public Optional<Resource> getResourceById(Long id){
 
         return resourceRepository.findById(id);
     }
 
+    @CachePut(key = "#id")
     public Resource updateResource(Long id, Resource updatedResource) {
         return resourceRepository.findById(id)
                 .map(existing -> {
@@ -47,12 +52,13 @@ public class ResourceService {
     }
 
     // Use the new case-insensitive query
+    @Cacheable(key = "'category:' + #category.toLowerCase()")
     public List<Resource> getResourcesByCategory(String category) {
         return resourceRepository.findByCategoryIgnoreCase(category);
     }
 
 
-    @CacheEvict(value = "resources", allEntries = true)
+    @CacheEvict(key = "#id", allEntries = false)
     public void deleteResource(Long id) {
 
         resourceRepository.deleteById(id);
