@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name = "wellness_resources")
+@Table(name = "resources")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
