@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS wellness_resources (
-                                                  resource_id SERIAL PRIMARY KEY,
+                                                  id SERIAL PRIMARY KEY,
                                                   title VARCHAR(100) NOT NULL,
     description TEXT,
     category VARCHAR(50),

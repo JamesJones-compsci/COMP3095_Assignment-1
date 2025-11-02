@@ -1,3 +1,11 @@
+# --------------------------------------------------
+# Commands to run this compose file:
+#     - docker-compose -p comp3095-wellness -f docker-compose.yml up -d
+#     This command will start the containers in detached mode (-d) without rebuilding the images (if they already exist)
+#
+#     - docker-compose -p comp3095-wellness -f docker-compose.yml up -d --build
+#     This command force the rebuild of images, even if the images already exist
+# ------------------------------------------------
 # version: '3.8'
 
 services:
@@ -34,5 +42,19 @@ services:
       - redis
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wellness-resource-serviceDB
       SPRING_DATASOURCE_USERNAME: jamesjones
       SPRING_DATASOURCE_PASSWORD: 100898394
+
+  pgadmin:
+    image: dpage/pgadmin4:9.2
+    ports:
+      - "8888:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.ca
+      - PGADMIN_DEFAULT_PASSWORD=password
+    container_name: pgadmin_wellness-resource-service
+
+# -------------------- Named volumes --------------------
+volumes:
+  wellness-resource-service_data:
