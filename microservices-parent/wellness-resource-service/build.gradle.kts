@@ -40,14 +40,16 @@ dependencies {
 
 	runtimeOnly("org.postgresql:postgresql")
 
-
-
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
-	testImplementation("org.testcontainers:junit-jupiter")
-	testImplementation("org.testcontainers:postgresql")
+	testImplementation("org.testcontainers:junit-jupiter:1.20.3")
+	testImplementation("org.testcontainers:postgresql:1.20.3")
 	testImplementation("io.rest-assured:rest-assured")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+
+	// Redis client (Jedis) for direct cache validation in integration tests
+	testImplementation("redis.clients:jedis:5.1.0")
 
 }
 

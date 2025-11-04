@@ -2,6 +2,7 @@ package ca.gbc.comp3095.wellnessresourceservice;
 
 import ca.gbc.comp3095.wellnessresourceservice.model.Resource;
 import ca.gbc.comp3095.wellnessresourceservice.repository.ResourceRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,41 +13,49 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 import static org.junit.Assert.assertEquals;
-
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @AutoConfigureMockMvc
 @Testcontainers
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest
+@SpringBootTest(properties = "spring.cache.type=none")
 class WellnessResourceServiceApplicationTests {
 
+	// PostgreSQL TestContainer
 	@Container
 	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
 			.withDatabaseName("testdb")
 			.withUsername("testuser")
-			.withPassword("testpass");
+			.withPassword("testpass")
+			.withReuse(true); // Optional: speeds up repeated test runs
 
+	// Redis TestContainer
+	@Container
+	static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine")
+			.withExposedPorts(6379)
+			.waitingFor(Wait.forListeningPort())
+			.withReuse(true); // Optional: speeds up repeated test runs
 
+	// Configure Spring properties to use TestContainers
 	@DynamicPropertySource
 	static void configureProperties(DynamicPropertyRegistry registry) {
+		// PostgreSQL
 		registry.add("spring.datasource.url", postgres::getJdbcUrl);
 		registry.add("spring.datasource.username", postgres::getUsername);
 		registry.add("spring.datasource.password", postgres::getPassword);
+
+		// Redis
+		registry.add("spring.redis.host", redis::getHost);
+		registry.add("spring.redis.port", () -> redis.getMappedPort(6379));
 	}
 
 	@Autowired
@@ -58,7 +67,7 @@ class WellnessResourceServiceApplicationTests {
 	@Autowired
 	private ResourceRepository resourceRepository;
 
-	private Resource createResourceRequest(){
+	private Resource createResourceRequest() {
 		return new Resource("Mindful Breathing", "Helps calm the mind", "mindfulness", "https://example.com/breathe");
 	}
 
@@ -67,23 +76,20 @@ class WellnessResourceServiceApplicationTests {
 		resourceRepository.deleteAll();
 	}
 
-
 	@Test
 	void createResourceTest() throws Exception {
 		Resource request = createResourceRequest();
 
 		mockMvc.perform(post("/api/resources")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isCreated());
 
 		assertEquals(1, resourceRepository.findAll().size());
 	}
 
-
 	@Test
-	void ReturnAllResourceTest() throws Exception {
-
+	void returnAllResourceTest() throws Exception {
 		resourceRepository.save(new Resource("Title1", "Desc1", "mindfulness", "https://url1.com"));
 		resourceRepository.save(new Resource("Title2", "Desc2", "counseling", "https://url2.com"));
 
@@ -91,7 +97,6 @@ class WellnessResourceServiceApplicationTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.length()").value(2));
 	}
-
 
 	@Test
 	void updateResourceTest() throws Exception {
@@ -101,7 +106,7 @@ class WellnessResourceServiceApplicationTests {
 		mockMvc.perform(put("/api/resources/" + saved.getId())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(saved)))
-				.andExpect(status().isNoContent()); // Updated to expect 204
+				.andExpect(status().isNoContent());
 
 		Resource updated = resourceRepository.findById(saved.getId()).get();
 		assertEquals("Updated Title", updated.getTitle());
@@ -112,9 +117,8 @@ class WellnessResourceServiceApplicationTests {
 		Resource saved = resourceRepository.save(createResourceRequest());
 
 		mockMvc.perform(delete("/api/resources/" + saved.getId()))
-				.andExpect(status().isNoContent()); // Updated to expect 204
+				.andExpect(status().isNoContent());
 
 		assertEquals(0, resourceRepository.count());
 	}
-
 }
