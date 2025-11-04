@@ -15,7 +15,7 @@ RUN ./gradlew clean build -x test
 # ------------------------------------------------------
 # Package Stage
 # ------------------------------------------------------
-FROM openjdk:24-jdk
+FROM eclipse-temurin:24-jdk
 
 # CREATE application directory inside container
 RUN mkdir /app
