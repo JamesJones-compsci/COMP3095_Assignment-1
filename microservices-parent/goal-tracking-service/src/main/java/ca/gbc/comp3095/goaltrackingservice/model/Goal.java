@@ -22,7 +22,7 @@ public class Goal {
     private String goalId; // Inside POJO this is the primary key
     private String name;
     private String description;
-    private String category;
+    private GoalCategory category;
     private String frequency;
     private LocalDate startDate;
     private LocalDate targetDate;

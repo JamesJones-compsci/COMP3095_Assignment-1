@@ -3,6 +3,7 @@ package ca.gbc.comp3095.goaltrackingservice.service;
 import ca.gbc.comp3095.goaltrackingservice.dto.GoalRequest;
 import ca.gbc.comp3095.goaltrackingservice.dto.GoalResponse;
 import ca.gbc.comp3095.goaltrackingservice.model.Goal;
+import ca.gbc.comp3095.goaltrackingservice.model.GoalCategory;
 import ca.gbc.comp3095.goaltrackingservice.repository.GoalRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class GoalServiceImpl implements GoalService {
         Goal goal = Goal.builder() // One line to call the setters
                 .name(request.name())
                 .description(request.description())
-                .category(request.category())
+                .category(GoalCategory.valueOf(request.category().toUpperCase()))
                 .frequency(request.frequency())
                 .startDate(request.startDate())
                 .targetDate(request.targetDate())
@@ -47,7 +48,7 @@ public class GoalServiceImpl implements GoalService {
                 goal.getGoalId(),
                 goal.getName(),
                 goal.getDescription(),
-                goal.getCategory(),
+                goal.getCategory().name(),
                 goal.getFrequency(),
                 goal.getStartDate(),
                 goal.getTargetDate(),
@@ -85,14 +86,16 @@ public class GoalServiceImpl implements GoalService {
 
         log.debug("Updating goal with id {}",  goalId);
 
-        Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(goalId));
-        Goal goal = mongoTemplate.findOne(query, Goal.class);
+        Goal goal = _goalRepository.findById(goalId).orElse(null);
+
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("_id").is(goalId)); - This is some internal way the id gets names _id
+//        Goal goal = mongoTemplate.findOne(query, Goal.class);
 
         if(goal != null){
             goal.setName(request.name());
             goal.setDescription(request.description());
-            goal.setCategory(request.category());
+            goal.setCategory(GoalCategory.valueOf(request.category().toUpperCase()));
             goal.setFrequency(request.frequency());
             goal.setStartDate(request.startDate());
             goal.setTargetDate(request.targetDate());
@@ -101,6 +104,7 @@ public class GoalServiceImpl implements GoalService {
             goal.setCurrentValue(request.currentValue());
             return  _goalRepository.save(goal).getGoalId();
         }
+        log.warn("No goal found with id {}", goalId);
         return goalId;
     }
 
@@ -129,7 +133,8 @@ public class GoalServiceImpl implements GoalService {
         log.debug("Fetching goals by status {}", status);
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("status").is(status));
+        // query.addCriteria(Criteria.where("status").regex("^" + status + "$", "i")); //Regex to accept a status of any casing
+        query.addCriteria(Criteria.where("status").regex(status, "i")); // Broader Regex to accept anything that has completed in it
         List<Goal> goals = mongoTemplate.find(query, Goal.class);
 
         return goals.stream()
@@ -158,7 +163,7 @@ public class GoalServiceImpl implements GoalService {
                 goal.getGoalId(),
                 goal.getName(),
                 goal.getDescription(),
-                goal.getCategory(),
+                goal.getCategory().name(),
                 goal.getFrequency(),
                 goal.getStartDate(),
                 goal.getTargetDate(),
