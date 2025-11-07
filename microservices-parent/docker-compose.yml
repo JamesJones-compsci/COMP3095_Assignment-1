@@ -9,15 +9,15 @@
 # version: '3.8'
 
 services:
-  postgres:
+  wellness-DB-postgres:
     image: postgres:15
-    container_name: postgres
+    container_name: wellness-DB-postgres
     environment:
       POSTGRES_USER: jamesjones
       POSTGRES_PASSWORD: 100898394
       POSTGRES_DB: wellness-resource-serviceDB
     ports:
-      - "5432:5432"
+      - "5481:5432"
     volumes:
       - ./docker/integrated/postgres/wellness-service/init/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
@@ -26,11 +26,11 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  wellness-DB-redis:
     image: redis:latest
-    container_name: wellness-redis
+    container_name: wellness-DB-redis
     ports:
-      - "6379:6379"
+      - "6381:6379"
 
   wellness-service:
     build: ./wellness-resource-service
@@ -39,21 +39,47 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - redis
+      - wellness-DB-redis
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/wellness-resource-serviceDB
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5481/wellness-resource-serviceDB
       SPRING_DATASOURCE_USERNAME: jamesjones
       SPRING_DATASOURCE_PASSWORD: 100898394
+      SPRING_DATA_REDIS_HOST: wellness-DB-redis
+      SPRING_DATA_REDIS_PORT: 6379
 
-  pgadmin:
-    image: dpage/pgadmin4:9.2
-    ports:
-      - "8888:80"
+  event-DB-postgres:
+    image: postgres:15
+    container_name: event-DB-postgres
     environment:
-      - PGADMIN_DEFAULT_EMAIL=user@domain.ca
-      - PGADMIN_DEFAULT_PASSWORD=password
-    container_name: pgadmin_wellness-resource-service
+      POSTGRES_USER: omar
+      POSTGRES_PASSWORD: eventservice
+      POSTGRES_DB: event-serviceDB
+    ports:
+      - "5433:5432"
+
+  event-service:
+    build: ./event-service
+    image: event-service:1.0
+    container_name: event-service
+    ports:
+      - "8033:8033"
+    depends_on:
+      - event-DB-postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/event-serviceDB
+      SPRING_DATASOURCE_USERNAME: omar
+      SPRING_DATASOURCE_PASSWORD: eventservice
+
+#  pgadmin:
+#    image: dpage/pgadmin4:9.2
+#    ports:
+#      - "8888:80"
+#    environment:
+#      - PGADMIN_DEFAULT_EMAIL=user@domain.ca
+#      - PGADMIN_DEFAULT_PASSWORD=password
+#    container_name: pgadmin_wellness-resource-service
 
 # -------------------- Named volumes --------------------
 volumes:
