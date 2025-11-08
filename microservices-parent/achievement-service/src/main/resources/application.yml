@@ -1,0 +1,59 @@
+# ============================================
+# Local Environment Configuration
+# ============================================
+# This profile is used when running locally
+# (e.g., via IntelliJ or Gradle bootRun command).
+# It connects to an in-memory H2 database instead of PostgreSQL.
+# Redis caching and Redis health checks are disabled
+# to simplify local testing and prevent "DOWN" actuator status.
+# ============================================
+
+server:
+  port: 8084
+
+spring:
+  application:
+    name: achievement-service
+
+  # --------------------------------------------
+  # H2 Database for Local Development
+  # --------------------------------------------
+  datasource:
+    url: jdbc:h2:mem:achievements;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update      # Automatically creates/updates tables based on entities
+    show-sql: true          # Logs SQL queries for debugging
+    open-in-view: false     # Prevents lazy loading issues during view rendering
+
+  # --------------------------------------------
+  # Cache Configuration (Disabled Locally)
+  # --------------------------------------------
+  cache:
+    type: none              # Disable Redis caching for local testing
+
+  # --------------------------------------------
+  # Redis Configuration (Optional / Not used locally)
+  # --------------------------------------------
+  data:
+    redis:
+      host: localhost
+      port: 6379            # Redis is only used when the Docker profile is active
+
+# --------------------------------------------
+# Actuator & Health Endpoints
+# --------------------------------------------
+management:
+  endpoint:
+    health:
+      show-details: always   # Shows detailed status of each component
+  health:
+    redis:
+      enabled: false         # Disable Redis health check locally
+  endpoints:
+    web:
+      exposure:
+        include: health,info

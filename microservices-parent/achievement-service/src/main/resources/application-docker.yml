@@ -1,0 +1,54 @@
+# ============================================
+# Docker Environment Configuration
+# ============================================
+# This configuration is loaded automatically
+# when the app runs inside Docker Compose.
+# (Triggered by: SPRING_PROFILES_ACTIVE=docker)
+#
+# Uses PostgreSQL and Redis containers defined
+# in docker-compose.yml.
+# ============================================
+
+server:
+  port: 8084
+
+spring:
+  application:
+    name: achievement-service
+
+  # --------------------------------------------
+  # PostgreSQL Database (from docker-compose)
+  # --------------------------------------------
+  datasource:
+    url: jdbc:postgresql://achievement-DB-postgres:5432/achievementdb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver   # Force Postgres driver in Docker
+
+  jpa:
+    hibernate:
+      ddl-auto: update       # Auto create/update DB tables on container startup
+    show-sql: true           # Log SQL for debugging inside container
+    open-in-view: false      # Prevents unnecessary lazy loading warnings
+
+  # --------------------------------------------
+  # Redis Cache (from docker-compose)
+  # --------------------------------------------
+  cache:
+    type: redis
+  data:
+    redis:
+      host: redis            # Service name from docker-compose.yml
+      port: 6379
+
+# --------------------------------------------
+# Actuator Endpoints
+# --------------------------------------------
+management:
+  endpoint:
+    health:
+      show-details: always   # Show detailed health info in Docker
+  endpoints:
+    web:
+      exposure:
+        include: health,info

@@ -1,14 +1,11 @@
 # --------------------------------------------------
 # Commands to run this compose file:
-#     - docker-compose -p comp3095-wellness -f docker-compose.yml up -d
-#     This command will start the containers in detached mode (-d) without rebuilding the images (if they already exist)
-#
-#     - docker-compose -p comp3095-wellness -f docker-compose.yml up -d --build
-#     This command force the rebuild of images, even if the images already exist
-# ------------------------------------------------
-# version: '3.8'
+#   docker compose -p comp3095-wellness -f docker-compose.yml up -d
+#   docker compose -p comp3095-wellness -f docker-compose.yml up -d --build
+# --------------------------------------------------
 
 services:
+  # ---------- Wellness stack ----------
   wellness-DB-postgres:
     image: postgres:15
     container_name: wellness-DB-postgres
@@ -48,6 +45,7 @@ services:
       SPRING_DATA_REDIS_HOST: wellness-DB-redis
       SPRING_DATA_REDIS_PORT: 6379
 
+  # ---------- Event stack ----------
   event-DB-postgres:
     image: postgres:15
     container_name: event-DB-postgres
@@ -72,6 +70,7 @@ services:
       SPRING_DATASOURCE_USERNAME: omar
       SPRING_DATASOURCE_PASSWORD: eventservice
 
+  # ---------- Goal stack ----------
   goal-DB-mongo:
     image: mongo:latest
     container_name: goal-DB-mongo
@@ -96,15 +95,49 @@ services:
       SPRING_DATA_MONGODB_PASSWORD: password
       SPRING_DATA_MONGODB_DATABASE: goal-tracking-service
 
-#  pgadmin:
-#    image: dpage/pgadmin4:9.2
-#    ports:
-#      - "8888:80"
-#    environment:
-#      - PGADMIN_DEFAULT_EMAIL=user@domain.ca
-#      - PGADMIN_DEFAULT_PASSWORD=password
-#    container_name: pgadmin_wellness-resource-service
+  # ---------- Achievement stack ----------
+  achievement-DB-postgres:
+    image: postgres:15
+    container_name: achievement-DB-postgres
+    environment:
+      POSTGRES_DB: achievementdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "15484:5432"
+    volumes:
+      - achievement-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d achievementdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Dedicated Redis for Achievement; do not publish host port
+  redis:
+    image: redis:latest
+    container_name: achievement-redis
+
+  achievement-service:
+    build: ./achievement-service
+    image: achievement-service:1.0
+    container_name: achievement-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      achievement-DB-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://achievement-DB-postgres:5432/achievementdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
 
 # -------------------- Named volumes --------------------
 volumes:
   wellness-resource-service_data:
+  achievement-db-data:
