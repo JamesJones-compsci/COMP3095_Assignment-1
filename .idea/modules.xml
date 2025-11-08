@@ -2,8 +2,19 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/comp3095_assignment-1.iml" filepath="$PROJECT_DIR$/.idea/comp3095_assignment-1.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/goal-tracking-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/goal-tracking-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/microservices-parent/event-service/event-service.iml" filepath="$PROJECT_DIR$/microservices-parent/event-service/event-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/event-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/event-service.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/microservices-parent.iml" filepath="$PROJECT_DIR$/.idea/modules/microservices-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event-service/microservices-parent.event-service.iml" filepath="$PROJECT_DIR$/.idea/modules/event-service/microservices-parent.event-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event-service/microservices-parent.event-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/event-service/microservices-parent.event-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event-service/microservices-parent.event-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/event-service/microservices-parent.event-service.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/microservices-parent.main.iml" filepath="$PROJECT_DIR$/.idea/modules/microservices-parent.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/microservices-parent.test.iml" filepath="$PROJECT_DIR$/.idea/modules/microservices-parent.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wellness-service/microservices-parent.wellness-service.iml" filepath="$PROJECT_DIR$/.idea/modules/wellness-service/microservices-parent.wellness-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wellness-resource-service.iml" filepath="$PROJECT_DIR$/.idea/modules/wellness-resource-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wellness-resource-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/wellness-resource-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wellness-resource-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/wellness-resource-service.test.iml" />
     </modules>
   </component>
 </project>
