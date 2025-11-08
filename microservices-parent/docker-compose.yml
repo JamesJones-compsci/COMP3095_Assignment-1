@@ -84,7 +84,7 @@ services:
 
   goal-service:
     build: ./goal-tracking-service
-    image: mongo:latest
+    image: goal-service:1.0
     container_name: goal-service
     ports:
       - "8087:8087"
