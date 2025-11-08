@@ -72,6 +72,30 @@ services:
       SPRING_DATASOURCE_USERNAME: omar
       SPRING_DATASOURCE_PASSWORD: eventservice
 
+  goal-DB-mongo:
+    image: mongo:latest
+    container_name: goal-DB-mongo
+    ports:
+      - "27087:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: goal-tracking-service
+
+  goal-service:
+    build: ./goal-tracking-service
+    image: mongo:latest
+    container_name: goal-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      - goal-DB-mongo
+    environment:
+      SPRING_DATA_MONGODB_HOST: goal-DB-mongo
+      SPRING_DATA_MONGODB_USERNAME: admin
+      SPRING_DATA_MONGODB_PASSWORD: password
+      SPRING_DATA_MONGODB_DATABASE: goal-tracking-service
+
 #  pgadmin:
 #    image: dpage/pgadmin4:9.2
 #    ports:
