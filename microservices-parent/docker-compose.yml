@@ -104,7 +104,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "15484:5432"
+      - "5484:5432"
     volumes:
       - achievement-db-data:/var/lib/postgresql/data
     healthcheck:
@@ -114,9 +114,9 @@ services:
       retries: 5
 
   # Dedicated Redis for Achievement; do not publish host port
-  redis:
+  achievement-DB-redis:
     image: redis:latest
-    container_name: achievement-redis
+    container_name: achievement-DB-redis
 
   achievement-service:
     build: ./achievement-service
@@ -127,11 +127,11 @@ services:
     depends_on:
       achievement-DB-postgres:
         condition: service_healthy
-      redis:
+      achievement-DB-redis:
         condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://achievement-DB-postgres:5432/achievementdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/achievementdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_DATA_REDIS_HOST: redis
