@@ -38,7 +38,7 @@ ENV MONGO_DB_USERNAME=admin \
     MONGO_DB_PASSWORD=password
 
 # Set a default port
-EXPOSE 8084
+EXPOSE 8087
 
 # Tell java, run a jar file, the one specified here
-ENTRYPOINT ["java", "-jar", "/app/product-service.jar"]
+ENTRYPOINT ["java", "-jar", "/app/goal-tracking-service.jar"]
