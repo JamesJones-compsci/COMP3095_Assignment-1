@@ -9,6 +9,42 @@
 # version: '3.8'
 
 services:
+  achievement-DB-postgres:
+    image: postgres:15
+    container_name: achievement-DB-postgres
+    environment:
+      POSTGRES_DB: achievementdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "15484:5432"
+    volumes:
+      - achievement-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d achievementdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  achievement-service:
+    build: ./achievement-service
+    image: achievement-service:1.0
+    container_name: achievement-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      achievement-DB-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://achievement-DB-postgres:5432/achievementdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
   postgres:
     image: postgres:15
     container_name: postgres
@@ -58,3 +94,4 @@ services:
 # -------------------- Named volumes --------------------
 volumes:
   wellness-resource-service_data:
+  achievement-db-data:
