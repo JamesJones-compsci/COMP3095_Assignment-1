@@ -1,0 +1,57 @@
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '3.5.6'
+  id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'ca.gbc.comp3095'
+version = '1.0.0'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  // ----------------------------
+  // Core Spring Boot Components
+  // ----------------------------
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-cache'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+  // ----------------------------
+  // Databases
+  // ----------------------------
+  implementation 'org.postgresql:postgresql:42.7.3'
+  runtimeOnly 'com.h2database:h2'
+  // H2 is used for local development (in-memory DB).
+  // When running in Docker, the app automatically uses PostgreSQL via application-docker.yml.
+  // This keeps local and container environments independent.
+
+  // ----------------------------
+  // Lombok (for cleaner entity and DTO classes)
+  // ----------------------------
+  compileOnly 'org.projectlombok:lombok:1.18.34'
+  annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+  // ----------------------------
+  // Testing Dependencies
+  // ----------------------------
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.testcontainers:junit-jupiter:1.20.2'
+  testImplementation 'org.testcontainers:postgresql:1.20.2'
+  testImplementation 'org.testcontainers:redis:1.20.2'
+}
+
+tasks.test {
+  useJUnitPlatform()
+}
