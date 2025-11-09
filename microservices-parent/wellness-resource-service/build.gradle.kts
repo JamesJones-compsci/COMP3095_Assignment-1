@@ -25,32 +25,35 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot dependencies
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-cache")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-
-	// Add Redis support
-	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis") // Redis support
 
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
-
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
-
 	runtimeOnly("org.postgresql:postgresql")
 
+	// Test dependencies
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
-	testImplementation("org.testcontainers:junit-jupiter:1.20.3")
-	testImplementation("org.testcontainers:postgresql:1.20.3")
-	testImplementation("io.rest-assured:rest-assured")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+	// ✅ Testcontainers BOM ensures all modules are aligned
+	testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.3"))
+
+	// Testcontainers modules
+	testImplementation("org.testcontainers:testcontainers")       // core, includes GenericContainer and Redis support
+	testImplementation("org.testcontainers:postgresql")            // PostgreSQL container
+	testImplementation("org.testcontainers:junit-jupiter")         // JUnit 5 integration
+
+	testImplementation("io.rest-assured:rest-assured")             // For REST API testing
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 	// Redis client (Jedis) for direct cache validation in integration tests
 	testImplementation("redis.clients:jedis:5.1.0")
-
 }
 
 tasks.withType<Test> {
